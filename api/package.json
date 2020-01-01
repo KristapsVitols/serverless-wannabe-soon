@@ -1,7 +1,7 @@
 {
   "name": "serverless",
   "version": "1.0.0",
-  "main": "src/temp-tools/linode-api-client.ts",
+  "main": "src/index.ts",
   "scripts": {
     "dev": "nodemon src/index.ts",
     "build": "tsc -p .",
