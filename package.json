@@ -1,19 +1,35 @@
 {
   "name": "serverless",
   "version": "1.0.0",
-  "description": "",
-  "main": "linode-api-client.js",
+  "main": "src/temp-tools/linode-api-client.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon src/index.ts",
+    "build": "tsc -p .",
+    "start": "node dist/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^8.2.0",
+    "express": "^4.17.1",
     "node-fetch": "^2.6.0"
   },
   "devDependencies": {
-    "@types/node-fetch": "^2.5.4"
-  }
+    "@types/express": "^4.17.2",
+    "@types/node": "^13.1.2",
+    "@types/node-fetch": "^2.5.4",
+    "nodemon": "^2.0.2",
+    "ts-node": "^8.5.4",
+    "typescript": "^3.7.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KristapsVitols/serverless-wannabe-soon.git"
+  },
+  "bugs": {
+    "url": "https://github.com/KristapsVitols/serverless-wannabe-soon/issues"
+  },
+  "homepage": "https://github.com/KristapsVitols/serverless-wannabe-soon#readme",
+  "description": ""
 }
