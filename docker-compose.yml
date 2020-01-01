@@ -1,0 +1,29 @@
+version: '2'
+
+services:
+  proxy:
+    build: ./nginx
+    ports:
+      - '8080:80'
+    depends_on:
+      - api
+      - client
+  api:
+    build: ./api
+    volumes:
+      - /app/node_modules
+      - ./api:/app
+    depends_on:
+      - db
+  client:
+    build: ./client
+    volumes:
+      - /app/node_modules
+      - ./client:/app
+    depends_on:
+      - db
+  db:
+    image: mongo
+    restart: always
+    ports:
+      - '27017:27017'
