@@ -13,4 +13,4 @@ app.get('/', (req, res) => {
     res.send('It is working!');
 });
 
-app.listen(3333, () => console.log('Server up on 3000'));
+app.listen(3333, () => console.log('Server up on 3333'));

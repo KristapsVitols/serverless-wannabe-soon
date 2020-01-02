@@ -24,9 +24,9 @@ export class LinodeApiClient {
             body: JSON.stringify({
                 type: 'g6-nanode-1',
                 region: 'us-east',
-                image: 'linode/debian9',
+                image: 'linode/ubuntu18.04',
                 root_pass: password,
-                label: 'testing-apix2'
+                label: 'testing-api-nice-again'
             })
         });
 

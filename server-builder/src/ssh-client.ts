@@ -4,10 +4,15 @@ import chalk from 'chalk';
 
 const sshClient = new NodeSsh();
 
+/**
+ * TODO: Add some sort of step output
+ * TODO: Output from all commands
+ */
 export class SshClient {
     private host: string;
     private username: string;
     private password: string;
+    private connectionAttempts: number = 0;
 
     constructor(host: string, username: string, password: string) {
         this.host = host;
@@ -17,8 +22,9 @@ export class SshClient {
 
     public async initialize() {
         await this.login();
-        await this.setupNode();
-        await this.setupExpressServer();
+        await this.setupDocker();
+        await this.setupTemplateFiles();
+        await this.runDocker();
         await this.logout();
     }
 
@@ -26,43 +32,86 @@ export class SshClient {
         const {host, username, password} = this;
 
         console.log(chalk.green.bold('>>>>> Logging in SSH .....'));
-        await sshClient.connect({host, username, password});
-        console.log(chalk.green.bold('>>>>> Logged in! <<<<<'));
+
+        try {
+            this.connectionAttempts++;
+            await sshClient.connect({host, username, password});
+
+            console.log(chalk.green.bold('>>>>> Logged in! <<<<<'));
+        } catch (error) {
+            console.log(error.message);
+            console.log(`Attempting to login again in 5s... Current attempt count: ${this.connectionAttempts}`);
+            setTimeout(() => this.login(), 5000);
+        }
     }
 
-    private async setupNode() {
-        // STEP 2
-        console.log(chalk.blue.bold('>>>>> Downloading nodejs .....'));
-        await sshClient.execCommand('curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash -');
-        console.log(chalk.blue.bold('>>>>> Downloaded <<<<<'));
+    private async setupDocker() {
+        console.log(chalk.blue.bold('>>>>> Setting up Docker .....'));
 
-        // STEP 3
-        console.log(chalk.yellow.bold('>>>>> Installing NodeJS .....'));
-        await sshClient.execCommand('sudo apt-get install nodejs');
-        console.log(chalk.yellow.bold('>>>>> NodeJS installed <<<<<'));
+        const re1 = await sshClient.execCommand('sudo apt-get update');
+        console.log(re1.stdout);
+
+        const re2 = await sshClient.execCommand('sudo apt-get remove docker docker-engine docker.io');
+        console.log(re2.stdout);
+
+        const re3 = await sshClient.execCommand('sudo apt-get install docker.io -y');
+        console.log(re3.stdout);
+
+        const re4 = await sshClient.execCommand('sudo curl -L "https://github.com/docker/compose/releases/download/1.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose');
+        console.log(re4.stdout);
+
+        const re5 = await sshClient.execCommand('sudo chmod +x /usr/local/bin/docker-compose');
+        console.log(re5.stdout);
+
+        const re6 = await sshClient.execCommand('sudo systemctl start docker');
+        console.log(re6.stdout);
+
+        const re7 = await sshClient.execCommand('sudo systemctl enable docker');
+        console.log(re7.stdout);
+
+        console.log(chalk.blue.bold('>>>>> Docker has been setup <<<<<'));
     }
 
-    private async setupExpressServer() {
-        // STEP 4
-        console.log(chalk.magenta.bold('>>>>> Copying index.js .....'));
-        await sshClient.putFile('./server-templates/base-express.js', 'index.js');
-        console.log(chalk.magenta.bold('>>>>> Index.js copied <<<<<'));
+    private async setupTemplateFiles() {
+        console.log(chalk.cyan.bold('>>>>> Setting up server template files .....'));
 
-        // STEP 5
-        console.log(chalk.cyan.bold('>>>>> Initializing npm project .....'));
-        await sshClient.execCommand('npm init -y && npm i express');
-        console.log(chalk.cyan.bold('>>>>> NPM project initialized <<<<<'));
+        const failed: [string?] = [];
+        const successful: [string?] = [];
 
-        // STEP 6
-        console.log(chalk.blueBright.bold('>>>>> Starting up server .....'));
-        sshClient.execCommand('node index.js');
-        console.log(chalk.blueBright.bold('>>>>> Server up! <<<<<'));
+        const status = await sshClient.putDirectory('./server-templates/express-base', 'express-base', {
+            recursive: true,
+            concurrency: 10,
+            tick: (localPath: string, remotePath: string, error: any) => {
+                if (error) {
+                    failed.push(localPath);
+                } else {
+                    successful.push(localPath);
+                }
+            }
+        });
+
+        console.log('the directory transfer was', status ? 'successful' : 'unsuccessful');
+        console.log('failed transfers', failed.join(', '));
+        console.log('successful transfers', successful.join(', '));
+
+        console.log(chalk.cyan.bold('>>>>> Server templates have been setup <<<<<'));
+    }
+
+    private async runDocker() {
+        console.log(chalk.red.bold('>>>>> Running Docker .....'));
+
+        await sshClient.execCommand('docker-compose -f express-base/docker-compose.yml up -d');
+
+        console.log(chalk.red.bold('>>>>> Docker is up and running .....'));
     }
 
     private async logout() {
         console.log(chalk.green.bold('>>>>> All done, exiting server .....'));
+
         await sshClient.execCommand('exit');
+
         console.log(chalk.green.bold('>>>>> Ssh connection closed. <<<<<'));
+
         process.exit(0);
     }
 }
