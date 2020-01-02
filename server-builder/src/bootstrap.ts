@@ -1,5 +1,5 @@
 import {LinodeApiClient} from './linode-api-client';
-import {SshClient} from './ssh-client';
+import {ServerBuilder} from './server-builder';
 import {randomBytes} from 'crypto';
 
 class Bootstrap {
@@ -33,7 +33,7 @@ class Bootstrap {
             if (response.status === 'running') {
                 console.log('Instance is ready, initializing ssh connection in a moment....');
                 clearInterval(interval);
-                setTimeout(this.initializeSsh, 20000);
+                setTimeout(this.setupServer, 20000);
             }
         }, 10000);
     }
@@ -44,7 +44,7 @@ class Bootstrap {
         console.log('Instance ID: ', this.instanceId);
     }
 
-    initializeSsh = () => (new SshClient(this.host, this.username, this.password)).initialize();
+    setupServer = () => (new ServerBuilder(this.host, this.username, this.password)).initialize();
 }
 
 (new Bootstrap()).initialize();

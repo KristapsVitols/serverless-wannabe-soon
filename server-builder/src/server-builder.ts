@@ -2,19 +2,19 @@
 import NodeSsh from 'node-ssh';
 import chalk from 'chalk';
 
-const sshClient = new NodeSsh();
-
 /**
  * TODO: Add some sort of step output
  * TODO: Output from all commands
  */
-export class SshClient {
+export class ServerBuilder {
+    private sshClient: NodeSsh;
     private host: string;
     private username: string;
     private password: string;
     private connectionAttempts: number = 0;
 
     constructor(host: string, username: string, password: string) {
+        this.sshClient = new NodeSsh();
         this.host = host;
         this.username = username;
         this.password = password;
@@ -35,7 +35,7 @@ export class SshClient {
 
         try {
             this.connectionAttempts++;
-            await sshClient.connect({host, username, password});
+            await this.sshClient.connect({host, username, password});
 
             console.log(chalk.green.bold('>>>>> Logged in! <<<<<'));
         } catch (error) {
@@ -48,25 +48,25 @@ export class SshClient {
     private async setupDocker() {
         console.log(chalk.blue.bold('>>>>> Setting up Docker .....'));
 
-        const re1 = await sshClient.execCommand('sudo apt-get update');
+        const re1 = await this.sshClient.execCommand('sudo apt-get update');
         console.log(re1.stdout);
 
-        const re2 = await sshClient.execCommand('sudo apt-get remove docker docker-engine docker.io');
+        const re2 = await this.sshClient.execCommand('sudo apt-get remove docker docker-engine docker.io');
         console.log(re2.stdout);
 
-        const re3 = await sshClient.execCommand('sudo apt-get install docker.io -y');
+        const re3 = await this.sshClient.execCommand('sudo apt-get install docker.io -y');
         console.log(re3.stdout);
 
-        const re4 = await sshClient.execCommand('sudo curl -L "https://github.com/docker/compose/releases/download/1.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose');
+        const re4 = await this.sshClient.execCommand('sudo curl -L "https://github.com/docker/compose/releases/download/1.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose');
         console.log(re4.stdout);
 
-        const re5 = await sshClient.execCommand('sudo chmod +x /usr/local/bin/docker-compose');
+        const re5 = await this.sshClient.execCommand('sudo chmod +x /usr/local/bin/docker-compose');
         console.log(re5.stdout);
 
-        const re6 = await sshClient.execCommand('sudo systemctl start docker');
+        const re6 = await this.sshClient.execCommand('sudo systemctl start docker');
         console.log(re6.stdout);
 
-        const re7 = await sshClient.execCommand('sudo systemctl enable docker');
+        const re7 = await this.sshClient.execCommand('sudo systemctl enable docker');
         console.log(re7.stdout);
 
         console.log(chalk.blue.bold('>>>>> Docker has been setup <<<<<'));
@@ -78,7 +78,7 @@ export class SshClient {
         const failed: [string?] = [];
         const successful: [string?] = [];
 
-        const status = await sshClient.putDirectory('./server-templates/express-base', 'express-base', {
+        const status = await this.sshClient.putDirectory('./server-templates/express-base', 'express-base', {
             recursive: true,
             concurrency: 10,
             tick: (localPath: string, remotePath: string, error: any) => {
@@ -100,7 +100,7 @@ export class SshClient {
     private async runDocker() {
         console.log(chalk.red.bold('>>>>> Running Docker .....'));
 
-        await sshClient.execCommand('docker-compose -f express-base/docker-compose.yml up -d');
+        await this.sshClient.execCommand('docker-compose -f express-base/docker-compose.yml up -d');
 
         console.log(chalk.red.bold('>>>>> Docker is up and running .....'));
     }
@@ -108,7 +108,7 @@ export class SshClient {
     private async logout() {
         console.log(chalk.green.bold('>>>>> All done, exiting server .....'));
 
-        await sshClient.execCommand('exit');
+        await this.sshClient.execCommand('exit');
 
         console.log(chalk.green.bold('>>>>> Ssh connection closed. <<<<<'));
 
