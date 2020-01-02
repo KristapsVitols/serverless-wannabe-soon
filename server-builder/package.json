@@ -1,0 +1,25 @@
+{
+  "name": "server-builder",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^13.1.2",
+    "@types/node-fetch": "^2.5.4",
+    "node-ts": "^5.0.3",
+    "nodemon": "^2.0.2",
+    "typescript": "^3.7.4"
+  },
+  "dependencies": {
+    "chalk": "^3.0.0",
+    "dotenv": "^8.2.0",
+    "node-fetch": "^2.6.0",
+    "node-ssh": "^7.0.0"
+  }
+}

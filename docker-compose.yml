@@ -22,6 +22,11 @@ services:
       - ./client:/app
     depends_on:
       - db
+  server-builder:
+    build: ./server-builder
+    volumes:
+      - /app/node_modules
+      - ./server-builder:/app
   db:
     image: mongo
     restart: always

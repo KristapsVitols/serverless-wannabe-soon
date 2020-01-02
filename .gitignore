@@ -1,5 +1,15 @@
+# API
 api/node_modules
 api/dist
 api/.env
+
+# CLIENT
 client/node_modules
+
+# SERVER BUILDER WORKER
+server-builder/node_modules
+server-builder/dist
+server-builder/.env
+
+# RAND
 .idea
