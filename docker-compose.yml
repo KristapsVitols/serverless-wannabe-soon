@@ -27,6 +27,10 @@ services:
     volumes:
       - /app/node_modules
       - ./server-builder:/app
+    depends_on:
+      - redis
+  redis:
+    image: 'redis:latest'
   db:
     image: mongo
     restart: always

@@ -26,7 +26,7 @@ export class LinodeApiClient {
                 region: 'us-east',
                 image: 'linode/ubuntu18.04',
                 root_pass: password,
-                label: 'testing-api-nice-again'
+                label: `testing-api-${Math.random()}`
             })
         });
 

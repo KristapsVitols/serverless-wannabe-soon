@@ -2,7 +2,7 @@ import {LinodeApiClient} from './linode-api-client';
 import {ServerBuilder} from './server-builder';
 import {randomBytes} from 'crypto';
 
-class Bootstrap {
+export class Bootstrap {
     private linodeApiClient: LinodeApiClient;
 
     private host: string = '';
@@ -46,5 +46,3 @@ class Bootstrap {
 
     setupServer = () => (new ServerBuilder(this.host, this.username, this.password)).initialize();
 }
-
-(new Bootstrap()).initialize();

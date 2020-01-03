@@ -1,6 +1,9 @@
 // @ts-ignore
 import NodeSsh from 'node-ssh';
 import chalk from 'chalk';
+import redis, {RedisClient} from 'redis';
+import dotenv from 'dotenv';
+dotenv.config();
 
 /**
  * TODO: Add some sort of step output
@@ -8,24 +11,45 @@ import chalk from 'chalk';
  */
 export class ServerBuilder {
     private sshClient: NodeSsh;
-    private host: string;
-    private username: string;
-    private password: string;
+    private redisPublisher: RedisClient;
+    private readonly host: string;
+    private readonly username: string;
+    private readonly password: string;
     private connectionAttempts: number = 0;
 
     constructor(host: string, username: string, password: string) {
         this.sshClient = new NodeSsh();
+        this.redisPublisher = redis.createClient(+process.env.REDIS_PORT!, process.env.REDIS_HOST).duplicate();
         this.host = host;
         this.username = username;
         this.password = password;
     }
 
     public async initialize() {
-        await this.login();
+        try {
+            await this.login();
+        } catch (error) {
+            this.connectionAttempts++;
+
+            if (this.connectionAttempts > 5) {
+                console.log(chalk.red.bold(`Failed to connect to SSH after ${this.connectionAttempts}`));
+                console.log(chalk.red.bold('Stopping server building...'));
+            }
+
+            console.log(error.message);
+            console.log(`Attempting to login again in 5s... Current attempt count: ${this.connectionAttempts}`);
+
+            setTimeout(() => this.initialize(), 5000);
+
+            return;
+        }
+
         await this.setupDocker();
         await this.setupTemplateFiles();
         await this.runDocker();
         await this.logout();
+
+        this.finish();
     }
 
     private async login() {
@@ -33,16 +57,9 @@ export class ServerBuilder {
 
         console.log(chalk.green.bold('>>>>> Logging in SSH .....'));
 
-        try {
-            this.connectionAttempts++;
-            await this.sshClient.connect({host, username, password});
+        await this.sshClient.connect({host, username, password});
 
-            console.log(chalk.green.bold('>>>>> Logged in! <<<<<'));
-        } catch (error) {
-            console.log(error.message);
-            console.log(`Attempting to login again in 5s... Current attempt count: ${this.connectionAttempts}`);
-            setTimeout(() => this.login(), 5000);
-        }
+        console.log(chalk.green.bold('>>>>> Logged in! <<<<<'));
     }
 
     private async setupDocker() {
@@ -111,7 +128,14 @@ export class ServerBuilder {
         await this.sshClient.execCommand('exit');
 
         console.log(chalk.green.bold('>>>>> Ssh connection closed. <<<<<'));
+    }
 
-        process.exit(0);
+    private finish() {
+        this.redisPublisher.publish('finished', JSON.stringify({
+            host: this.host,
+            username: this.username,
+            password: this.password,
+            url: `http://${this.host}`,
+        }));
     }
 }

@@ -8,4 +8,4 @@ RUN npm i && npm cache clean --force
 
 COPY . .
 
-CMD ["npm", "run", "build"]
+CMD ["npm", "run", "dev"]
