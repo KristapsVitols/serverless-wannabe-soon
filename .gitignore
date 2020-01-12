@@ -9,7 +9,7 @@ dashboard/node_modules
 # LANDING
 landing/node_modules
 landing/.nuxt
-landing/sw.js
+landing/static/sw.js
 
 # SERVER BUILDER WORKER
 server-builder/node_modules
