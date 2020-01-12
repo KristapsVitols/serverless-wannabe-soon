@@ -8,6 +8,7 @@ dashboard/node_modules
 
 # LANDING
 landing/node_modules
+landing/.nuxt
 
 # SERVER BUILDER WORKER
 server-builder/node_modules
