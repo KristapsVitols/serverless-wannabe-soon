@@ -3,8 +3,11 @@ api/node_modules
 api/dist
 api/.env
 
-# CLIENT
-client/node_modules
+# DASHBOARD
+dashboard/node_modules
+
+# LANDING
+landing/node_modules
 
 # SERVER BUILDER WORKER
 server-builder/node_modules

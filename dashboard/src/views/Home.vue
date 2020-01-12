@@ -27,6 +27,9 @@
             socket: io(),
         }),
         async mounted() {
+            await this.getInstance();
+            await this.auth();
+
             const res = await fetch('/api/server-status');
             const data = await res.json();
             this.serverInfo.status = data.status;
@@ -50,7 +53,24 @@
                 const data = await res.json();
 
                 this.serverInfo.status = data.status;
-            }
+            },
+            async auth() {
+                const res = await fetch('/api/auth', {method: 'POST'});
+                const data = await res.json();
+
+                console.log(data);
+            },
+            async getInstance() {
+                const res = await fetch('/api/validate-instance', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({instanceId: '45.79.129.169'}),
+                });
+
+                const data = await res.json();
+
+                console.log(data);
+            },
         }
     }
 </script>
