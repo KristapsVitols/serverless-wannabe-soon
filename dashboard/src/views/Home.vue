@@ -2,7 +2,7 @@
     <div class="home">
         <button @click="createServer">Create Server</button>
         <div v-if="serverInfo.status">
-            <p>Server status:  {{ serverInfo.status }}</p>
+            <p>Server status: {{ serverInfo.status }}</p>
             <p>Server host: {{ serverInfo.host || '...' }}</p>
             <p>Server username: {{ serverInfo.username || '...' }}</p>
             <p>Server password: {{ serverInfo.password || '...' }}</p>
@@ -10,7 +10,6 @@
         </div>
     </div>
 </template>
-
 <script>
     import io from 'socket.io-client';
 
