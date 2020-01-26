@@ -10,6 +10,11 @@ const routes = [
         name: 'index',
         component: Index
     },
+    {
+        path: '/applications',
+        name: 'apps',
+        component: () => import('@/views/Applications.vue'),
+    }
 ];
 
 const router = new VueRouter({

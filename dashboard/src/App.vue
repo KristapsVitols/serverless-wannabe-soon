@@ -1,10 +1,10 @@
 <template>
     <div id="app" class="d-flex">
         <DashboardSidebar/>
-        <div class="d-flex min-vh-100 justify-content-center flex-column bg-light flex-fill">
+        <div class="d-flex min-vh-100 justify-content-center flex-column flex-fill">
             <DashboardHeader/>
-            <main class="flex-grow-1">
-                <router-view/>
+            <main class="bw-bg-secondary flex-grow-1 d-flex">
+                <router-view class="container my-5"/>
             </main>
             <DashboardFooter/>
         </div>
@@ -24,3 +24,6 @@
         },
     }
 </script>
+<style lang="scss" scoped>
+    .trigger-x {}
+</style>

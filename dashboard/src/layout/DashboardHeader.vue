@@ -1,6 +1,6 @@
 <template>
-    <div class="bg-white">
-        wahtever stuff here
+    <div class="bg-white p-4">
+        Some super useful stuff here | heh heh
     </div>
 </template>
 <script>

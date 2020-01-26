@@ -1,5 +1,5 @@
 <template>
     <div>
-        blehhh
+        <p>Super useful info here, well not really</p>
     </div>
 </template>
