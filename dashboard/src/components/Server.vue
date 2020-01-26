@@ -1,6 +1,6 @@
 <template>
     <div class="home">
-        <button @click="createServer">Create Server</button>
+        <button @click="createServer">Create new app</button>
         <div v-if="serverInfo.status">
             <p>Server status: {{ serverInfo.status }}</p>
             <p>Server host: {{ serverInfo.host || '...' }}</p>
