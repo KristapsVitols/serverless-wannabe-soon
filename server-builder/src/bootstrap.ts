@@ -1,6 +1,5 @@
 import {LinodeApiClient} from './linode-api-client';
 import {ServerBuilder} from './server-builder';
-import {randomBytes} from 'crypto';
 
 export class Bootstrap {
     private linodeApiClient: LinodeApiClient;
@@ -10,14 +9,18 @@ export class Bootstrap {
     private instanceId: number = 0;
 
     private readonly password: string;
+    private readonly name: string;
+    private readonly token: string;
 
-    constructor() {
+    constructor(token: string, name: string, password: string) {
         this.linodeApiClient = new LinodeApiClient();
-        this.password = randomBytes(24).toString('hex');
+        this.password = password;
+        this.name = name;
+        this.token = token;
     }
 
     async initialize() {
-        const response = await this.linodeApiClient.createLinode(this.password);
+        const response = await this.linodeApiClient.createLinode(this.name, this.password);
         this.host = response.ipv4[0];
         this.instanceId = response.id;
 
@@ -31,7 +34,7 @@ export class Bootstrap {
             const response = await this.linodeApiClient.getLinodeInstance(this.instanceId);
 
             if (response.status === 'running') {
-                console.log('Instance is ready, initializing ssh connection in a moment....');
+                console.log('Application is ready, initializing ssh connection in a moment....');
                 clearInterval(interval);
                 setTimeout(this.setupServer, 20000);
             }
@@ -41,8 +44,8 @@ export class Bootstrap {
     async outputInstanceInfo() {
         console.log('Password: ', this.password);
         console.log('Ip address: ', this.host);
-        console.log('Instance ID: ', this.instanceId);
+        console.log('Application ID: ', this.instanceId);
     }
 
-    setupServer = () => (new ServerBuilder(this.host, this.username, this.password)).initialize();
+    setupServer = () => (new ServerBuilder(this.host, this.username, this.password, this.token, this.instanceId)).initialize();
 }

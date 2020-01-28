@@ -12,7 +12,7 @@ export class LinodeApiClient {
         this.apiUrl = process.env.LINODE_API_URL as string;
     }
 
-    async createLinode(password: string) {
+    async createLinode(name: string, password: string) {
         console.log(chalk.red.bold('>>>>> Attempting to create a new node .....'));
 
         const res = await fetch(`${this.apiUrl}/linode/instances`, {
@@ -26,7 +26,7 @@ export class LinodeApiClient {
                 region: 'us-east',
                 image: 'linode/ubuntu18.04',
                 root_pass: password,
-                label: `testing-api-${Math.random()}`
+                label: name,
             })
         });
 

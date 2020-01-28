@@ -60,7 +60,7 @@
                 console.log(data);
             },
             async getInstance() {
-                const res = await fetch('/api/validate-instance', {
+                const res = await fetch('/api/validate-application', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({instanceId: '45.79.129.169'}),

@@ -8,9 +8,10 @@ const redisClient = redis.createClient(+process.env.REDIS_PORT!, process.env.RED
 
 const sub = redisClient.duplicate();
 
-sub.on('message', async (channel: string, message: string) => {
-    console.log('Starting background process.... ' + message);
-    (new Bootstrap()).initialize();
+sub.on('message', async (channel: string, applicationInfo: string) => {
+    const application = JSON.parse(applicationInfo);
+    console.log('Starting background process.... ' + application.name);
+    (new Bootstrap(application.applicationToken, application.name, application.password)).initialize();
 });
 
 sub.subscribe('buildServer');

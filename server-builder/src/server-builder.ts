@@ -15,14 +15,18 @@ export class ServerBuilder {
     private readonly host: string;
     private readonly username: string;
     private readonly password: string;
+    private readonly token: string;
+    private readonly instanceId: number;
     private connectionAttempts: number = 0;
 
-    constructor(host: string, username: string, password: string) {
+    constructor(host: string, username: string, password: string, token: string, instanceId: number) {
         this.sshClient = new NodeSsh();
         this.redisPublisher = redis.createClient(+process.env.REDIS_PORT!, process.env.REDIS_HOST).duplicate();
         this.host = host;
         this.username = username;
         this.password = password;
+        this.token = token;
+        this.instanceId = instanceId;
     }
 
     public async initialize() {
@@ -135,7 +139,8 @@ export class ServerBuilder {
             host: this.host,
             username: this.username,
             password: this.password,
-            url: `http://${this.host}`,
+            token: this.token,
+            instanceId: this.instanceId,
         }));
     }
 }
