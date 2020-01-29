@@ -1,25 +1,28 @@
+// Libs
 import express from 'express';
 import http from 'http';
-import {initDatabase} from './db';
-import dotenv from 'dotenv';
-import socketIO from 'socket.io';
+import {config} from 'dotenv';
 import cookieParser from 'cookie-parser';
+import socketIO from 'socket.io';
 import cookie from 'cookie';
-import applicationRoutes from './modules/application/routes/application-routes';
 import cors from 'cors';
-import {RedisSubscriber} from "./listeners/redis-subscriber";
+import {initDatabase} from './db';
+config();
 
+import applicationRoutes from './modules/application/routes/application-routes';
+import {RedisSubscriber} from './listeners/redis-subscriber';
+
+// App setup
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 
+// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
-dotenv.config();
-
-initDatabase();
+(async () => await initDatabase())();
 
 // Routes
 app.use('/api/applications', applicationRoutes);

@@ -1,9 +1,6 @@
 import {RequestHandler} from 'express';
-import {config} from 'dotenv';
 import {ApplicationService} from '../services/application-service';
 import {RedisPublisher} from '../../../listeners/redis-publisher';
-
-config();
 
 export class ApplicationController {
     private readonly applicationService: ApplicationService;
